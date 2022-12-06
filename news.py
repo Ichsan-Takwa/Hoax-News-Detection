@@ -4,7 +4,7 @@ from newsapi.newsapi_client import NewsApiClient
 from model import predict
 
 newsClient=NewsApiClient(api_key='7d125ba012bc447681da91239d255267')
-news_feed = newsClient.get_top_headlines( language='en',page_size=80)
+news_feed = newsClient.get_everything(q="yahoo", language='en')
 
 def getArticlePredict(url):
     article = downloadArticle(url)
@@ -25,7 +25,6 @@ def downloadArticle(url):
 def getSpecifArticle(currentReal=0,currentFake=0, index=0, maxReal=0,maxFake=0):
     global news_feed
     for i in range(index, len(news_feed['articles'])):
-        # print(f"$%$%$$$%$% >>>>> {i}")
         article = news_feed['articles'][i]
         try:
             result = predict(downloadArticle(article['url']).text)
@@ -44,10 +43,48 @@ def getSpecifArticle(currentReal=0,currentFake=0, index=0, maxReal=0,maxFake=0):
         elif article['pred_result'].upper() == "REAL" and currentReal < maxReal:
             return article, currentReal+1,currentFake, i+1
     else:
-        article = news_feed['articles'][0]
+        # article = news_feed['articles'][0]
         # print(len(news_feed), index, currentReal )
-        result = predict(downloadArticle(article['url']).text)
-        article['pred_result']= result[0]
-        article['pred_score']= result[1]
-        article['date'] = article['publishedAt'][0:10]
-        return article, currentReal,currentFake, 20
+        # try:
+            # result = predict(downloadArticle(article['url']).text)
+        # except:
+            # result = ["UNDEFINED",""]
+        return getSpecifArticle(currentReal=currentReal,currentFake=currentFake, index=index, maxReal=0,maxFake=0)
+        # article['pred_result']= result[0]
+        # article['pred_score']= result[1]
+        # article['date'] = article['publishedAt'][0:10]
+        # return article, currentReal,currentFake, 20
+
+
+
+
+
+# def getHeadlines():
+#     articles=[]
+#     top_headlines= newsClient.get_everything(q="politic OR politics OR biden OR donald trump OR war OR election", language='en',page_size=6)
+#     realAtc = []
+#     fakeAtc = []
+#     real_count = 0
+#     fake_count = 0
+#     maxEach = 6
+#     count = 0
+#     for article in top_headlines['articles']:
+#         article['pred_result']=predict(downloadArticle(article['url']).text)
+#         article['date'] = article['publishedAt'][0:10]
+#         count+=1
+#         print("===>>>", count, article['pred_result'])
+#         if article['pred_result'].upper() == "FAKE" and fake_count < maxEach:
+#             fake_count+=1
+#             fakeAtc.append(article)
+#         elif article['pred_result'].upper() == "REAL" and real_count < maxEach:
+#             real_count+=1
+#             realAtc.append(article)
+#         elif real_count == fake_count and real_count >= maxEach:
+#             break
+
+
+#     articles = realAtc + fakeAtc
+#     shuffle(articles)
+#     print("==== > ",len(top_headlines['articles']),real_count, fake_count)
+#     return articles
+
